@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clinical Trial Data Monitoring System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 40px 20px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            color: #666;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .section {
+            background: rgba(255, 255, 255, 0.95);
+            margin: 20px 0;
+            padding: 30px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .section:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .section h2 {
+            color: #2c3e50;
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+
+        .section h3 {
+            color: #34495e;
+            font-size: 1.4em;
+            margin: 20px 0 15px 0;
+            display: flex;
+            align-items: center;
+        }
+
+        .section h3::before {
+            content: "▶";
+            color: #3498db;
+            margin-right: 10px;
+            font-size: 0.8em;
+        }
+
+        .goals-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .goal-card {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .goal-card:hover {
+            transform: scale(1.05);
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .data-table th {
+            background: linear-gradient(135deg, #34495e, #2c3e50);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .data-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #ecf0f1;
+            background: white;
+        }
+
+        .data-table tr:hover td {
+            background: #f8f9fa;
+        }
+
+        .tab-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .tab-card {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+            padding: 25px;
+            border-radius: 12px;
+            transition: transform 0.3s ease;
+        }
+
+        .tab-card:nth-child(2) {
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+        }
+
+        .tab-card:nth-child(3) {
+            background: linear-gradient(135deg, #27ae60, #229954);
+        }
+
+        .tab-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .tab-card h4 {
+            font-size: 1.3em;
+            margin-bottom: 15px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+            padding-bottom: 5px;
+        }
+
+        .tab-card ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .tab-card li {
+            margin: 10px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .tab-card li::before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #fff;
+            font-weight: bold;
+        }
+
+        .formula {
+            background: linear-gradient(135deg, #8e44ad, #6a237a);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            margin: 10px 0;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .visual-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .visual-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid #3498db;
+            transition: transform 0.3s ease;
+        }
+
+        .visual-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .visual-card h4 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+
+        .visual-card p {
+            color: #666;
+            font-size: 0.95em;
+        }
+
+        .bonus-section {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+
+        .bonus-section h3 {
+            color: white;
+            margin-bottom: 20px;
+        }
+
+        .bonus-section h3::before {
+            color: #fff;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .feature-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .feature-item strong {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 1.1em;
+        }
+
+        .interactive-btn {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin: 10px 5px;
+        }
+
+        .interactive-btn:hover {
+            background: linear-gradient(135deg, #2980b9, #21618c);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .highlight {
+            background: linear-gradient(135deg, #f1c40f, #f39c12);
+            color: #2c3e50;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .section {
+                padding: 20px;
+            }
+        }
+
+        .fade-in {
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeIn 0.6s ease forwards;
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .section:nth-child(odd) {
+            animation-delay: 0.1s;
+        }
+
+        .section:nth-child(even) {
+            animation-delay: 0.2s;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header fade-in">
+            <h1>🏥 Clinical Trial Data Monitoring System</h1>
+            <p>A comprehensive Power BI solution for healthcare data analysis, designed to help researchers and medical professionals track trial effectiveness, monitor patient outcomes, and make data-driven decisions.</p>
+        </div>
+
+        <div class="section fade-in">
+            <h2>🎯 Use Case Scenario</h2>
+            <p>You are working as a <span class="highlight">Data Analyst</span> for a medical research organization conducting clinical trials across multiple hospitals. Your mission is to create a comprehensive dashboard for trial monitoring that empowers researchers and doctors with actionable insights.</p>
+            
+            <h3>Key Objectives</h3>
+            <div class="goals-grid">
+                <div class="goal-card">
+                    <h4>📊 Compare Recovery Effectiveness</h4>
+                    <p>Analyze performance across different trial groups</p>
+                </div>
+                <div class="goal-card">
+                    <h4>💊 Track Dosage Variations</h4>
+                    <p>Monitor dosage patterns and their impact</p>
+                </div>
+                <div class="goal-card">
+                    <h4>🚨 Flag Outliers</h4>
+                    <p>Identify unexpected recovery drops or anomalies</p>
+                </div>
+                <div class="goal-card">
+                    <h4>📈 Forecast Trends</h4>
+                    <p>Predict improvement patterns and outcomes</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="section fade-in">
+            <h2>📋 Sample Data Structure</h2>
+            <p>Your dataset contains the following key information for analysis:</p>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Month</th>
+                        <th>Hospital</th>
+                        <th>Trial Group</th>
+                        <th>Dosage %</th>
+                        <th>Recovery %</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Jan</td>
+                        <td>AIIMS</td>
+                        <td>Control</td>
+                        <td>60</td>
+                        <td>40</td>
+                    </tr>
+                    <tr>
+                        <td>Jan</td>
+                        <td>AIIMS</td>
+                        <td>Treatment A</td>
+                        <td>70</td>
+                        <td>50</td>
+                    </tr>
+                    <tr>
+                        <td>Jan</td>
+                        <td>AIIMS</td>
+                        <td>Treatment B</td>
+                        <td>75</td>
+                        <td>52</td>
+                    </tr>
+                    <tr>
+                        <td>Feb</td>
+                        <td>AIIMS</td>
+                        <td>Control</td>
+                        <td>60</td>
+                        <td>35</td>
+                    </tr>
+                    <tr>
+                        <td>Feb</td>
+                        <td>AIIMS</td>
+                        <td>Treatment A</td>
+                        <td>75</td>
+                        <td>60</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section fade-in">
+            <h2>🔧 Power Query Implementation</h2>
+            <p>Leverage all three main tabs in Power Query to transform your raw data into analysis-ready insights:</p>
+            
+            <div class="tab-container">
+                <div class="tab-card">
+                    <h4>🏠 Home Tab Actions</h4>
+                    <ul>
+                        <li>Promote Headers from imported files</li>
+                        <li>Choose relevant columns only</li>
+                        <li>Remove null or faulty readings</li>
+                        <li>Sort by Month and Hospital</li>
+                        <li>Group By: Average Dosage % and Recovery %</li>
+                    </ul>
+                </div>
+                
+                <div class="tab-card">
+                    <h4>🔄 Transform Tab</h4>
+                    <ul>
+                        <li>Calculate Recovery Efficiency Ratio</li>
+                        <li>Apply rounding to 2 decimal places</li>
+                        <li>Fill Down missing Trial Group entries</li>
+                        <li>Replace "NA" or "?" with nulls</li>
+                        <li>Compute statistical measures</li>
+                    </ul>
+                </div>
+                
+                <div class="tab-card">
+                    <h4>➕ Add Column Tab</h4>
+                    <ul>
+                        <li>Create custom Growth Rate calculations</li>
+                        <li>Add conditional flags for risk assessment</li>
+                        <li>Generate Index columns for time-series</li>
+                        <li>Transform examples to Month numbers</li>
+                        <li>Build improvement indicators</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h3>📐 Key Calculations</h3>
+            <div class="formula">
+                Recovery Efficiency = (Recovery % ÷ Dosage %) × 100
+            </div>
+            <div class="formula">
+                Growth Rate = ((Current Recovery - Previous Recovery) ÷ Previous Recovery) × 100
+            </div>
+        </div>
+
+        <div class="section fade-in">
+            <h2>📊 Power BI Visualizations</h2>
+            <p>Create compelling visuals that tell the story of your clinical trial data:</p>
+            
+            <div class="visual-grid">
+                <div class="visual-card">
+                    <h4>📈 100% Stacked Area Chart</h4>
+                    <p>Show trial group recovery percentages over time with clean structure and proportional relationships</p>
+                </div>
+                
+                <div class="visual-card">
+                    <h4>📉 Line Chart</h4>
+                    <p>Track growth percentage in recovery over time periods to identify trends and patterns</p>
+                </div>
+                
+                <div class="visual-card">
+                    <h4>📊 Bar Chart</h4>
+                    <p>Compare average dosage versus recovery rates by hospital for institutional analysis</p>
+                </div>
+                
+                <div class="visual-card">
+                    <h4>🎯 KPI Card</h4>
+                    <p>Display percentage of groups showing greater than 10% recovery growth as a key metric</p>
+                </div>
+                
+                <div class="visual-card">
+                    <h4>🔍 Scatter Plot</h4>
+                    <p>Map dosage percentage against recovery percentage to reveal correlations and saturation points</p>
+                </div>
+                
+                <div class="visual-card">
+                    <h4>🌡️ Heat Map Matrix</h4>
+                    <p>Color-coded recovery percentages by hospital and month for quick performance spotting</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bonus-section fade-in">
+            <h2>🎁 Bonus Dashboard Features</h2>
+            <h3>Advanced Interactivity</h3>
+            <div class="feature-grid">
+                <div class="feature-item">
+                    <strong>🔖 Bookmark Toggles</strong>
+                    Switch between Control, Treatment A, and Treatment B views
+                </div>
+                <div class="feature-item">
+                    <strong>🔍 Drill-through Pages</strong>
+                    Navigate from summary to detailed hospital-wise statistics
+                </div>
+                <div class="feature-item">
+                    <strong>📊 Dynamic Slicers</strong>
+                    Filter by month, hospital, or dosage range
+                </div>
+                <div class="feature-item">
+                    <strong>💡 Tooltip Pages</strong>
+                    Hover insights showing dosage, patient count, and risk flags
+                </div>
+                <div class="feature-item">
+                    <strong>🏆 Dynamic Ranking</strong>
+                    Sort trial groups by recovery percentage each month
+                </div>
+                <div class="feature-item">
+                    <strong>📈 Trend Forecasting</strong>
+                    Linear predictions based on historical recovery data
+                </div>
+            </div>
+        </div>
+
+        <div class="section fade-in">
+            <h2>✅ Skills Summary</h2>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Power Query Tab</th>
+                        <th>Skills Applied</th>
+                        <th>Business Impact</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Home</strong></td>
+                        <td>Data cleanup, filtering, sorting, grouping</td>
+                        <td>Clean, organized data foundation</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Transform</strong></td>
+                        <td>Mathematical operations, statistics, text parsing</td>
+                        <td>Calculated insights and standardized metrics</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Add Column</strong></td>
+                        <td>Conditional logic, growth calculations, flags</td>
+                        <td>Business rules and performance indicators</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section fade-in" style="text-align: center;">
+            <h2>🚀 Ready to Start?</h2>
+            <p>This comprehensive use case demonstrates real-world application of Power Query's capabilities in healthcare analytics. The combination of data transformation, mathematical operations, and conditional logic creates a powerful foundation for clinical trial monitoring.</p>
+            <button class="interactive-btn" onclick="downloadPDF()">📥 Download as PDF</button>
+            <button class="interactive-btn" onclick="alert('Great! You\'re ready to build your clinical trial dashboard. Start by importing your data and applying the Home tab transformations.')">Begin Your Project</button>
+            <button class="interactive-btn" onclick="alert('Consider exploring additional healthcare datasets or expanding to include patient demographics and adverse events.')">Explore Extensions</button>
+        </div>
+    </div>
+
+    <script>
+        // Add smooth scrolling and interactive elements
+        document.querySelectorAll('.section').forEach((section, index) => {
+            section.classList.add('fade-in');
+            section.style.animationDelay = `${index * 0.1}s`;
+        });
+
+        // Add hover effects for enhanced interactivity
+        document.querySelectorAll('.visual-card, .goal-card, .tab-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-5px) scale(1.02)';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0) scale(1)';
+            });
+        });
+
+        // Download as PDF function
+        function downloadPDF() {
+            // Create a new window with print-friendly styles
+            const printWindow = window.open('', '_blank');
+            const htmlContent = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <meta charset="UTF-8">
+                    <title>Clinical Trial Data Monitoring System</title>
+                    <style>
+                        * { margin: 0; padding: 0; box-sizing: border-box; }
+                        body { font-family: Arial, sans-serif; font-size: 12px; line-height: 1.4; color: #333; }
+                        .container { max-width: 100%; margin: 0; padding: 20px; }
+                        .header { text-align: center; margin-bottom: 30px; }
+                        .header h1 { font-size: 24px; color: #2c3e50; margin-bottom: 10px; }
+                        .header p { font-size: 14px; color: #666; }
+                        .section { margin: 20px 0; page-break-inside: avoid; }
+                        .section h2 { color: #2c3e50; font-size: 18px; margin-bottom: 15px; border-bottom: 2px solid #3498db; padding-bottom: 5px; }
+                        .section h3 { color: #34495e; font-size: 16px; margin: 15px 0 10px 0; }
+                        .goals-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin: 15px 0; }
+                        .goal-card { background: #f8f9fa; padding: 15px; border-radius: 5px; border-left: 4px solid #3498db; }
+                        .goal-card h4 { font-size: 14px; margin-bottom: 5px; color: #2c3e50; }
+                        .goal-card p { font-size: 12px; color: #666; }
+                        .data-table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+                        .data-table th { background: #34495e; color: white; padding: 10px; text-align: left; font-size: 12px; }
+                        .data-table td { padding: 8px 10px; border-bottom: 1px solid #ddd; font-size: 11px; }
+                        .tab-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin: 15px 0; }
+                        .tab-card { background: #f8f9fa; padding: 20px; border-radius: 8px; border-left: 4px solid #e74c3c; }
+                        .tab-card h4 { font-size: 14px; margin-bottom: 10px; color: #2c3e50; }
+                        .tab-card ul { list-style: none; padding: 0; }
+                        .tab-card li { margin: 5px 0; font-size: 11px; padding-left: 15px; position: relative; }
+                        .tab-card li::before { content: "✓"; position: absolute; left: 0; color: #27ae60; }
+                        .formula { background: #f8f9fa; padding: 10px; border-radius: 5px; font-family: monospace; margin: 10px 0; text-align: center; border-left: 4px solid #8e44ad; }
+                        .visual-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin: 15px 0; }
+                        .visual-card { background: #f8f9fa; padding: 15px; border-radius: 5px; border-left: 4px solid #3498db; }
+                        .visual-card h4 { font-size: 13px; margin-bottom: 5px; color: #2c3e50; }
+                        .visual-card p { font-size: 11px; color: #666; }
+                        .feature-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin: 15px 0; }
+                        .feature-item { background: #f8f9fa; padding: 10px; border-radius: 5px; border-left: 3px solid #ff6b6b; }
+                        .feature-item strong { display: block; margin-bottom: 3px; font-size: 12px; color: #2c3e50; }
+                        .feature-item { font-size: 11px; color: #666; }
+                        .highlight { background: #fff3cd; padding: 2px 6px; border-radius: 3px; font-weight: bold; }
+                        @media print { 
+                            .section { page-break-inside: avoid; }
+                            .goals-grid, .tab-container, .visual-grid, .feature-grid { break-inside: avoid; }
+                        }
+                    </style>
+                </head>
+                <body>
+                    ${document.querySelector('.container').innerHTML.replace(/<button[^>]*>.*?<\/button>/gi, '')}
+                </body>
+                </html>
+            `;
+            
+            printWindow.document.write(htmlContent);
+            printWindow.document.close();
+            
+            // Wait for content to load, then print
+            setTimeout(() => {
+                printWindow.print();
+                printWindow.close();
+            }, 1000);
+        }
+    </script>
+</body>
+</html>
